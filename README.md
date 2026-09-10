@@ -4,6 +4,9 @@ TicketWave is a stateless concert ticket booking application built to evaluate K
 
 The project combines a FastAPI web application, a multi-stage Docker image, Kubernetes manifests, CPU-based autoscaling, and a reproducible Locust experiment suite. The booking endpoint deliberately performs CPU-intensive payment hashing and QR-code generation, providing a realistic workload that allows the HPA to react to changing demand.
 
+<img width="955" height="545" alt="image" src="https://github.com/user-attachments/assets/0347b038-c997-4584-8caf-603fa2424fa5" />
+
+
 ## Project goals
 
 - Bootstrap and operate a self-managed Kubernetes cluster on AWS EC2.
@@ -181,6 +184,26 @@ Before another run, restore a clean single-replica state:
 ## Experimental results
 
 Each primary workload was repeated five times. The main aggregate results were:
+
+### Continuous workload
+
+![Continuous workload results](ProjectCC/experiments/output/09_panel_continuous.png)
+
+The pod count follows the increasing workload up to the ten-replica ceiling and then decreases gradually after demand falls. Median latency remains comparatively stable while the HPA is able to add capacity.
+
+### Bursty workload
+
+![Bursty workload results](ProjectCC/experiments/output/09_panel_bursty.png)
+
+The system does not fully scale back to one pod between the two bursts. This residual warm capacity allows it to handle the second burst more efficiently.
+
+### Stress workload
+
+![Stress workload results](ProjectCC/experiments/output/09_panel_stress.png)
+
+At 60 concurrent users the application reaches its ten-pod limit. Throughput stabilizes, but both median and tail latency rise sharply, identifying the deployment's capacity ceiling.
+
+### Aggregate metrics
 
 | Workload | Pod range | Max CPU | Throughput | p50 | p95 | Availability |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
