@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ticketing-app
+  labels:
+    app: ticketing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ticketing
+  template:
+    metadata:
+      labels:
+        app: ticketing
+    spec:
+      containers:
+        - name: ticketing
+          image: gioviciarra/ticketing-app:1.0.0
+          ports:
+            - containerPort: 8000
+          env:
+            - name: PAYMENT_BCRYPT_COST
+              value: "12"
+            - name: PAYMENT_HASH_ROUNDS
+              value: "4"
+            - name: ENABLE_PDF
+              value: "false"
+            - name: LOG_LEVEL
+              value: "info"
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 15

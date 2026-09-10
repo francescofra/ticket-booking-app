@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}TicketWave &middot; Concerts{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <h1>Live concerts, instant tickets.</h1>
+  <p class="hero-sub">Pick a show, secure your seat. Demo app — no real payments are processed.</p>
+</section>
+
+<section id="concerts-section" class="concerts">
+  <div class="concerts-grid">
+    {% for c in concerts %}
+    <article class="card" data-concert-id="{{ c.id }}">
+      <div class="card-body">
+        <h2 class="card-artist">{{ c.artist }}</h2>
+        <p class="card-meta"><span class="card-date">{{ c.date }}</span> &middot; <span>{{ c.venue }}</span></p>
+        <div class="card-row">
+          <span class="card-price">&euro; {{ '%.2f'|format(c.price_eur) }}</span>
+          <span class="card-seats" data-seats="{{ c.available_seats }}">
+            {% if c.available_seats > 0 %}
+              {{ c.available_seats }} seats left
+            {% else %}
+              Sold out
+            {% endif %}
+          </span>
+        </div>
+        <button class="btn-primary book-btn"
+                data-id="{{ c.id }}"
+                data-artist="{{ c.artist }}"
+                data-price="{{ c.price_eur }}"
+                {% if c.available_seats <= 0 %}disabled{% endif %}>
+          Book tickets
+        </button>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<div id="modal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <button class="modal-close" data-close aria-label="Close">&times;</button>
+
+    <div id="booking-view">
+      <h3 id="modal-title">Book your ticket</h3>
+      <p id="modal-concert" class="modal-concert"></p>
+      <form id="booking-form" novalidate>
+        <input type="hidden" name="concert_id" />
+        <label>
+          <span>Full name</span>
+          <input type="text" name="name" required minlength="2" maxlength="80" autocomplete="name" />
+        </label>
+        <label>
+          <span>Email</span>
+          <input type="email" name="email" required autocomplete="email" />
+        </label>
+        <label>
+          <span>Quantity</span>
+          <input type="number" name="quantity" required min="1" max="10" value="1" />
+        </label>
+        <label>
+          <span>Card number (demo)</span>
+          <input type="text" name="payment_token" required minlength="4" maxlength="32"
+                 placeholder="4242 4242 4242 4242" autocomplete="off" />
+        </label>
+        <div class="form-row">
+          <span id="form-total" class="form-total">Total: &euro; 0.00</span>
+          <button type="submit" class="btn-primary" id="submit-btn">Confirm booking</button>
+        </div>
+        <p id="form-error" class="form-error" hidden></p>
+      </form>
+    </div>
+
+    <div id="processing-view" class="hidden">
+      <div class="spinner"></div>
+      <h3>Processing payment&hellip;</h3>
+      <p class="muted">Verifying transaction and issuing your ticket.</p>
+    </div>
+
+    <div id="confirmation-view" class="hidden">
+      <div class="check-mark">&check;</div>
+      <h3>Booking confirmed</h3>
+      <p id="conf-artist" class="conf-artist"></p>
+      <dl class="conf-list">
+        <dt>Ticket ID</dt><dd id="conf-ticket"></dd>
+        <dt>Holder</dt><dd id="conf-holder"></dd>
+        <dt>Quantity</dt><dd id="conf-qty"></dd>
+        <dt>Total paid</dt><dd id="conf-total"></dd>
+        <dt>Served by pod</dt><dd id="conf-pod"></dd>
+      </dl>
+      <img id="conf-qr" class="conf-qr" alt="Ticket QR code" />
+      <button class="btn-secondary" data-close>Close</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/app.js"></script>
+{% endblock %}

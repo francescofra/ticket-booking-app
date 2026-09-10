@@ -1,0 +1,4 @@
+Experiment,Pod min,Pod max,Max CPU tot (m),Avg throughput (req/s),Max throughput (req/s),Avg p50 (ms),Avg p95 (ms),Max p95 (ms),Avg error rate (%),Avg availability (%)
+Continuous,1,10,1516,8.54,17.14,162.9,911.3,2260.0,0.0,100.0
+Bursty,1,10,2047,7.15,17.9,327.6,1291.6,5000.0,0.01,99.99
+Stress,1,10,1693,14.25,17.64,1994.0,6312.9,16200.0,0.349,99.651
